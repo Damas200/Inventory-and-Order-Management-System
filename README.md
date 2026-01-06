@@ -41,9 +41,4 @@ This capstone project designs, implements, and queries a **fully normalized rela
 5. **Category Rankings**: Clear leaders in Electronics (MacBook), Apparel (Adidas), Books (Da Vinci Code)
 6. **Customer Behavior**: Some customers return within weeks (repeat buyers identified)
 
-## File Structure
-├── erd.png                  # Entity-Relationship Diagram (visual schema)
-├── schema.sql               # DDL: CREATE TABLE statements with constraints
-├── queries.sql              # DML: Sample data + all KPI queries + views + stored procedure
-├── README.md                # This file (project documentation)
-└── submission.zip           # Full submission package
+
