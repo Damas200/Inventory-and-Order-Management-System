@@ -1,4 +1,4 @@
-`-- =============================================
+-- =============================================
 -- Inventory and Order Management System
 -- Author: Damas NIYONKURU 
 -- Date: January 06, 2026
