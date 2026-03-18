@@ -46,7 +46,7 @@ This project implements a relational database system for managing customers, pro
 
 ##  ER Diagram
 
-![ERD](ERD Diagram.jpeg)
+![ERD](erd.png)
 
 ---
 
