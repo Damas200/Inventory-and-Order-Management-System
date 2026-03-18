@@ -1,52 +1,91 @@
-#  Inventory and Order Management System
+# Inventory and Order Management System
 
-## Project Overview
-This project is an SQL capstone for **Module 3 (NSS)**. It implements an **Inventory and Order Management System** for an e-commerce company using **PostgreSQL**. The system manages customers, products, inventory, and orders, and supports business analytics through advanced SQL queries.
+##  Overview
 
----
-
-## Objectives
-- Design a **normalized relational database (3NF)**
-- Implement the schema using **SQL DDL**
-- Populate the database with realistic sample data
-- Write **business KPI queries** and **analytical queries**
-- Create **views** and **stored procedures** for performance and integrity
+This project implements a relational database system for managing customers, products, inventory, and orders. It supports multi-product orders, inventory tracking, and audit logging.
 
 ---
 
-##  Database Design
-The database consists of the following tables:
-- **Customers** – stores customer information
-- **Products** – stores product details
-- **Inventory** – tracks available stock for each product
-- **Orders** – stores order-level information
-- **Order_Items** – bridge table linking orders and products
+##  Features
 
-An ERD diagram is included to show relationships and cardinality.
+* Multi-product order processing
+* Inventory management with real-time updates
+* Order lifecycle tracking (Pending → Completed)
+* Audit logging:
 
----
-
-## 🛠 Technologies Used
-- PostgreSQL
-- SQL (DDL & DML)
-- dbdiagram.io (ERD design)
-- Git & GitHub
+  * Order audit trail
+  * Inventory audit trail
+* Data integrity with constraints and foreign keys
+* Performance optimization with indexes
 
 ---
 
----
+## Database Schema
 
-##  Key Features
-- Data integrity enforced using **primary keys, foreign keys, and constraints**
-- Business KPIs:
-  - Total revenue
-  - Top customers by spending
-  - Best-selling products
-  - Monthly sales trends
-- Analytical queries using **window functions**
-- **CustomerSalesSummary** view for performance optimization
-- **ProcessNewOrder** stored procedure to safely handle inventory updates
+* Customers
+* Products
+* Inventory
+* Orders
+* Order Items
+* Order Audit
+* Inventory Audit
 
 ---
 
+##  Core Functionality
+
+### ProcessNewOrder()
+
+* Validates customer
+* Processes multiple products per order
+* Updates inventory
+* Logs all actions
+* Handles errors (e.g., insufficient stock)
+
+---
+
+##  ER Diagram
+
+![ERD](ERD Diagram.jpeg)
+
+---
+
+##  Setup Instructions
+
+### 1. Create Database
+
+```sql
+CREATE DATABASE inventory_db;
+```
+
+### 2. Run Schema
+
+```bash
+psql -U postgres -d inventory_db -f sql/schema.sql
+```
+
+### 3. Load Data & Logic
+
+```bash
+psql -U postgres -d inventory_db -f sql/data_and_logic.sql
+```
+
+---
+
+##  Example Usage
+
+```sql
+SELECT ProcessNewOrder(
+  2,
+  '[{"product_id":3,"quantity":1},{"product_id":4,"quantity":2}]'
+);
+```
+
+---
+
+##  Author
+
+Damas Niyonkuru
+
+---
 

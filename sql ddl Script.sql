@@ -1,118 +1,77 @@
--- =============================================
--- Inventory and Order Management System
--- Author: Damas NIYONKURU 
--- Date: January 06, 2026
--- =============================================
-
-CREATE DATABASE inventory_db;
-
--- Clean up existing Database if they exist
--- DROP DATABASE IF EXISTS inventory_db;
-
--- Clean up existing tables if they exist 
--- DROP TABLE IF EXISTS Order_Items CASCADE;
--- DROP TABLE IF EXISTS Orders CASCADE; 
--- DROP TABLE IF EXISTS Inventory CASCADE;
--- DROP TABLE IF EXISTS Products CASCADE;
--- DROP TABLE IF EXISTS Customers CASCADE;
-
-
--- =====================================
--- 2. DDL COMMENTS – TABLE CREATION
+-- =====================================================
+-- UPDATED DDL: INVENTORY & ORDER MANAGEMENT SYSTEM
 -- =====================================================
 
-
--- TABLE: customers
--- Purpose:
--- Stores all customer-related information.
--- Each customer can place multiple orders.
--- =====================================================
-CREATE TABLE customers (
-    customer_id SERIAL PRIMARY KEY,        -- Unique identifier for each customer
-    full_name VARCHAR(100) NOT NULL,        -- Customer full name (required)
-    email VARCHAR(100) UNIQUE NOT NULL,     -- Email must be unique and not null
-    phone VARCHAR(20),                      -- Optional phone number
-    shipping_address TEXT                  -- Address used for shipping orders
+-- CUSTOMERS
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    shipping_address TEXT
 );
 
-
--- =====================================================
--- TABLE: products
--- Purpose:
--- Stores all products sold by the e-commerce company.
--- =====================================================
-CREATE TABLE products (
-    product_id SERIAL PRIMARY KEY,          -- Unique product identifier
-    product_name VARCHAR(100) NOT NULL,     -- Name of the product
-    category VARCHAR(50) NOT NULL,           -- Product category (Electronics, Apparel, etc.)
+-- PRODUCTS
+CREATE TABLE IF NOT EXISTS products (
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
     price DECIMAL(10,2) NOT NULL CHECK (price >= 0)
-        -- Product price must always be non-negative
 );
 
-
--- =====================================================
--- TABLE: inventory
--- Purpose:
--- Tracks current stock levels for each product.
--- Inventory is separated from products to avoid redundancy
--- and allow future scalability.
--- =====================================================
-CREATE TABLE inventory (
-    product_id INT PRIMARY KEY,             -- One-to-one relationship with products
+-- INVENTORY
+CREATE TABLE IF NOT EXISTS inventory (
+    product_id INT PRIMARY KEY,
     quantity_on_hand INT NOT NULL CHECK (quantity_on_hand >= 0),
-        -- Stock quantity cannot be negative
-    CONSTRAINT fk_inventory_product
-        FOREIGN KEY (product_id)
-        REFERENCES products(product_id)
-        ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
-
--- =====================================================
--- TABLE: orders
--- Purpose:
--- Stores high-level order information.
--- Each order belongs to exactly one customer.
--- =====================================================
-CREATE TABLE orders (
-    order_id SERIAL PRIMARY KEY,             -- Unique order identifier
-    customer_id INT NOT NULL,                -- Customer who placed the order
-    order_date DATE NOT NULL,                -- Date when order was placed
-    total_amount DECIMAL(10,2),              -- Total order value
-    order_status VARCHAR(20) NOT NULL,       -- Pending, Shipped, Delivered
-    CONSTRAINT fk_orders_customer
-        FOREIGN KEY (customer_id)
-        REFERENCES customers(customer_id)
+-- ORDERS
+CREATE TABLE IF NOT EXISTS orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(10,2),
+    order_status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
 
-
--- =====================================================
--- TABLE: order_items
--- Purpose:
--- Bridge table to resolve the many-to-many relationship
--- between orders and products.
--- Also stores historical price at time of purchase.
--- =====================================================
-CREATE TABLE order_items (
-    order_item_id SERIAL PRIMARY KEY,        -- Unique row identifier
-    order_id INT NOT NULL,                   -- Associated order
-    product_id INT NOT NULL,                 -- Product in the order
+-- ORDER ITEMS
+CREATE TABLE IF NOT EXISTS order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
-        -- Quantity must be greater than zero
     price_at_purchase DECIMAL(10,2) NOT NULL CHECK (price_at_purchase >= 0),
-        -- Historical price (important for accurate revenue reporting)
-    CONSTRAINT fk_order_items_order
-        FOREIGN KEY (order_id)
-        REFERENCES orders(order_id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_order_items_product
-        FOREIGN KEY (product_id)
-        REFERENCES products(product_id)
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- ORDER AUDIT
+CREATE TABLE IF NOT EXISTS order_audit (
+    audit_id SERIAL PRIMARY KEY,
+    order_id INT,
+    action VARCHAR(50),
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+-- INVENTORY AUDIT (
+CREATE TABLE IF NOT EXISTS inventory_audit (
+    audit_id SERIAL PRIMARY KEY,
+    product_id INT,
+    change_quantity INT,
+    action VARCHAR(50),
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+-- =====================================================
+-- INDEXES 
+-- =====================================================
 
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_order_date ON orders(order_date);
 
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
 
-
+CREATE INDEX IF NOT EXISTS idx_inventory_product_id ON inventory(product_id);
